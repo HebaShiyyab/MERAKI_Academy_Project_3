@@ -103,7 +103,7 @@ app.delete("/articles/:id", (req, res) => {
 });
 
 app.delete("/articles", (req, res) => {
-  const author = req.params.author;
+  const author = req.query.author;
   const delMessageAut = {
     success: true,
     message: `Success delete all articles for the author => ${author}`,
