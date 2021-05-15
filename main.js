@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { v4: uuidv4 } = require("uuid");
+const { uuid } = require("uuidv4");
 const port = 5000;
 
 const articles = [
@@ -69,45 +69,54 @@ app.post("/articles", (req, res, next) => {
   next();
 });
 app.put("/articles/:id", (req, res) => {
-  const replaceArc = res.params.id;
-  articles.find((element, i) => {
-    if (element.id.toString() === replaceArc.toString()) {
-      articles[i].title = req.body.title;
-      articles[i].description = req.body.description;
-      articles[i].author = req.body.author;
-      res.status(200);
-      res.json(articles[i]);
-    }
+  const id = req.params.id;
+
+  let index;
+  const found = articles.find((element, i) => {
+    index = i;
+    return element.id == id;
   });
+
+  const { title, description, author } = req.body;
+
+  articles[index] = { id, title, description, author };
+
+  res.status(200);
+  res.json(articles[index]);
 });
 
 app.delete("/articles/:id", (req, res) => {
-  const deleteArc = req.params.id;
+  const id = req.params.id;
   const delMessage = {
     success: true,
-    message: `Success Delete article with id => ${deleteArc}`,
+    message: `Success Delete article with id => ${id}`,
   };
-  articles.find((element, i) => {
-    if (element.id.toString() === deleteArc.toString()) {
-      articles.slice(i, 1);
-      res.json(delMessage);
-    }
+  let index;
+  const found = articles.find((element, i) => {
+    index = i;
+    return element.id == id;
   });
+
+  articles.splice(index, 1);
+
+  res.json(delMessage);
 });
 
 app.delete("/articles", (req, res) => {
-  const deleteAut = req.params.author;
-  articles.find((element, i) => {
-    if (element.author === deleteAut) {
-      articles.slice(i, 1);
-      const delMessageAut = {
-        success: true,
-        message: `Success delete all articles for the author => ${deleteAut}`,
-      };
-      res.json(delMessageAut);
-    }
+  const author = req.params.author;
+  const delMessageAut = {
+    success: true,
+    message: `Success delete all articles for the author => ${author}`,
+  };
+  let index;
+  const found = articles.filter((element, i) => {
+    index = i;
+    return element.author == author;
   });
+  articles.splice(index, 1);
+  res.json(delMessageAut);
 });
+
 app.listen(port, () => {
   console.log(`the server at http://localhost:${port}`);
 });
