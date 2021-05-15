@@ -92,8 +92,7 @@ app.delete("/articles/:id", (req, res) => {
     message: `Success Delete article with id => ${id}`,
   };
   let index;
-  const found = articles.find((element, i) => {
-    index = i;
+  const found = articles.find((element, index) => {
     return element.id == id;
   });
 
@@ -108,12 +107,12 @@ app.delete("/articles", (req, res) => {
     success: true,
     message: `Success delete all articles for the author => ${author}`,
   };
-  let index;
-  const found = articles.filter((element, i) => {
-    index = i;
-    return element.author == author;
-  });
-  articles.splice(index, 1);
+  let obj = {};
+  for (i = 0; i < articles.length; i++) {
+    if (author == articles[i].author) {
+      abj = articles.splice(i, 1);
+    }
+  }
   res.json(delMessageAut);
 });
 
