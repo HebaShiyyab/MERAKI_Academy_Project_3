@@ -63,28 +63,51 @@ app.post("/articles", (req, res, next) => {
     author: author,
     id: userId,
   };
-
   res.status(201);
   articles.push(createNewArticle);
   res.json(createNewArticle);
   next();
 });
 app.put("/articles/:id", (req, res) => {
-  res.status(200);
-  const { title, description, author } = req.body;
-  const createNewArticle = {
-    title: title,
-    description: description,
-    author: author,
-  
-  };
-  createNewArticle.id = id ;
-  res.json(createNewArticle);
+  const replaceArc = res.params.id;
+  articles.find((element, i) => {
+    if (element.id.toString() === replaceArc.toString()) {
+      articles[i].title = req.body.title;
+      articles[i].description = req.body.description;
+      articles[i].author = req.body.author;
+      res.status(200);
+      res.json(articles[i]);
+    }
+  });
 });
 
-app.delete("/articles/:id",(req,res)=>{
+app.delete("/articles/:id", (req, res) => {
+  const deleteArc = req.params.id;
+  const delMessage = {
+    success: true,
+    message: `Success Delete article with id => ${deleteArc}`,
+  };
+  articles.find((element, i) => {
+    if (element.id.toString() === deleteArc.toString()) {
+      articles.slice(i, 1);
+      res.json(delMessage);
+    }
+  });
+});
 
-})
+app.delete("/articles", (req, res) => {
+  const deleteAut = req.params.author;
+  articles.find((element, i) => {
+    if (element.author === deleteAut) {
+      articles.slice(i, 1);
+      const delMessageAut = {
+        success: true,
+        message: `Success delete all articles for the author => ${deleteAut}`,
+      };
+      res.json(delMessageAut);
+    }
+  });
+});
 app.listen(port, () => {
   console.log(`the server at http://localhost:${port}`);
 });
