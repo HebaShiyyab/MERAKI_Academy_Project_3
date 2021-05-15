@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
+const { v4: uuidv4 } = require("uuid");
 const port = 5000;
+
 const articles = [
   {
     id: 1,
@@ -52,19 +54,37 @@ app.get("/articles/search_1/:author", (req, res) => {
     res.json("User not found ");
   }
 });
-app.post("/articles", (req, res) => {
-  // const createNewArticle = {title:req.body.title,description:req.body.description, author:req.body.author};
-  const createNewArticle = {
-    title: "Server",
-    description: "Lorem, Quam, mollitia.",
-    author: "Ayman",
-  };
+app.post("/articles", (req, res, next) => {
   const { title, description, author } = req.body;
-  articles.push(createNewArticle);
+  const userId = uuidv4();
+  const createNewArticle = {
+    title: title,
+    description: description,
+    author: author,
+    id: userId,
+  };
+
   res.status(201);
+  articles.push(createNewArticle);
   res.json(createNewArticle);
-  //   res.json(articles);
+  next();
 });
+app.put("/articles/:id", (req, res) => {
+  res.status(200);
+  const { title, description, author } = req.body;
+  const createNewArticle = {
+    title: title,
+    description: description,
+    author: author,
+  
+  };
+  createNewArticle.id = id ;
+  res.json(createNewArticle);
+});
+
+app.delete("/articles/:id",(req,res)=>{
+
+})
 app.listen(port, () => {
   console.log(`the server at http://localhost:${port}`);
 });
