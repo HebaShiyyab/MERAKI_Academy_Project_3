@@ -10,8 +10,8 @@ const users = new mongoose.Schema({
 });
 
 const articles = new mongoose.Schema({
-  title: { type: String },
-  description: { type: String },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
   author: { type: mongoose.Schema.ObjectId, ref: "users" },
 });
 
