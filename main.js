@@ -38,18 +38,19 @@ app.get("/articles", (req, res) => {
       res.json(err);
     });
 });
-// app.get("/articles/author", (req, res) => {
-//   Articles.find({author:{ObjectId}})
-//     .then((result) => {
-//       res.status(200);
-//       res.json(result);
-//     })
-//     .catch((err) => {
-//       res.json(err);
-//     });
-// });
-app.get("/articles/id", (req, res) => {
-  Articles.find({}).populate("author","firstName")
+// articles by author 
+app.get("/articles/author", async (req, res) => {
+  let authorId;
+  await User.findOne({ firstName: req.query.author })
+    .then((result) => {
+      authorId = result._id;
+
+      res.json(authorId);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+  Articles.findOne({ author: authorId })
     .then((result) => {
       res.status(200);
       res.json(result);
@@ -58,7 +59,19 @@ app.get("/articles/id", (req, res) => {
       res.json(err);
     });
 });
-
+// articles by id 
+app.get("/articles/id", (req, res) => {
+  Articles.findOne({_id:req.query.id})
+    .populate("author", "firstName")
+    .exec()
+    .then((result) => {
+      res.status(200);
+      res.json(result);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
 
 app.post("/articles", async (req, res) => {
   const { title, description, author } = req.body;
@@ -79,32 +92,34 @@ app.post("/articles", async (req, res) => {
     });
 });
 
-app.put("/articles",(req,res)=>{
-  const {author}=req.body;
-  Articles.updateOne({author:author})
-  .then((result)=>{
-    res.json(result);
-  
-  }).catch((err)=>{
-    res.json(err);
-  })
+app.put("/articles/id ", (req, res) => {
+  const{title,description}=req.body;
+    Articles.updateOne({_id:req.query.id},{title,description})
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
-app.delete("/articles/id",(req,res)=>{
-  Articles
-  .deleteOne({id:id}).then((result)=>{
-    res.json(result);
-  }).catch((err)=>{
-    res.json(err);
-  })
+app.delete("/articles/id", (req, res) => {
+  Articles.deleteOne({ _id:req.query.id })
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
-app.delete("/articles/author",(req,res)=>{
-  Articles
-  .deleteOne({author:author}).then((result)=>{
-    res.json(result);
-  }).catch((err)=>{
-    res.json(err);
-  })
-})
+app.delete("/articles/author", (req, res) => {
+  Articles.deleteOne({ author: author })
+    .then((result) => {
+      res.json(result);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
 app.listen(port, () => {
   console.log(`the server at http://localhost:${port}`);
 });
