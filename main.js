@@ -1,121 +1,51 @@
 const express = require("express");
-const app = express();
+const db = require("./project_3_v01");
+const { User, Articles } = require("./Schema");
 const { uuid } = require("uuidv4");
 const port = 5000;
 
-const articles = [
-  {
-    id: 1,
-    title: "How I learn coding?",
-    description: "Lorem, Quam, mollitia.",
-    author: "Jouza",
-  },
-  {
-    id: 2,
-    title: "Coding Best Practices",
-    description: "Lorem, ipsum dolor sit, Quam, mollitia.",
-    author: "Besslan",
-  },
-  {
-    id: 3,
-    title: "Debugging",
-    description: "Lorem, Quam, mollitia.",
-    author: "Jouza",
-  },
-];
+const app = express();
 app.use(express.json());
-app.get("/articles", (req, res) => {
-  res.status = 200;
-  res.json(articles);
-});
-app.get("/articles/search", (req, res) => {
-  const user = req.query.id;
-  const found = articles.find((element) => {
-    return element.id === Number(user);
-  });
-  if (found) {
-    res.status(200);
-    res.json(found);
-  } else {
-    res.status(404);
-    res.json("User not found ");
-  }
-});
-app.get("/articles/search_1/:author", (req, res) => {
-  const user1 = req.params.author;
-  const found1 = articles.find((element) => {
-    return element.author === user1;
-  });
-  if (found1) {
-    res.status(200);
-    res.json(found1);
-  } else {
-    res.status(404);
-    res.json("User not found ");
-  }
-});
-app.post("/articles", (req, res, next) => {
+
+app.post("/articles", async (req, res) => {
   const { title, description, author } = req.body;
-  const userId = uuidv4();
-  const createNewArticle = {
-    title: title,
-    description: description,
-    author: author,
-    id: userId,
-  };
-  res.status(201);
-  articles.push(createNewArticle);
-  res.json(createNewArticle);
-  next();
-});
-app.put("/articles/:id", (req, res) => {
-  const id = req.params.id;
-
-  let index;
-  const found = articles.find((element, i) => {
-    index = i;
-    return element.id == id;
+  // const userId = uuidv4();
+  const articlesNew = new Articles({
+    title,
+    description,
+    author,
   });
-
-  const { title, description, author } = req.body;
-
-  articles[index] = { id, title, description, author };
-
-  res.status(200);
-  res.json(articles[index]);
+  await articlesNew
+    .save()
+    .then((result) => {
+      res.json(result);
+      res.status(201);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
-
-app.delete("/articles/:id", (req, res) => {
-  const id = req.params.id;
-  const delMessage = {
-    success: true,
-    message: `Success Delete article with id => ${id}`,
-  };
-  let index;
-  const found = articles.find((element, index) => {
-    return element.id == id;
+app.post("/users", async (req, res) => {
+  const { firstName, lastName, age, country, email, password } = req.body;
+  // const userId = uuidv4();
+  const userNew = new User({
+    firstName,
+    lastName,
+    age,
+    country,
+    email,
+    password,
   });
-
-  articles.splice(index, 1);
-
-  res.json(delMessage);
+  await userNew
+    .save()
+    .then((result) => {
+      res.json(result);
+      res.status(201);
+    })
+    .catch((err) => {
+      res.json(err);
+    });
 });
-
-app.delete("/articles", (req, res) => {
-  const author = req.query.author;
-  const delMessageAut = {
-    success: true,
-    message: `Success delete all articles for the author => ${author}`,
-  };
-  let obj = {};
-  for (i = 0; i < articles.length; i++) {
-    if (author == articles[i].author) {
-      abj = articles.splice(i, 1);
-    }
-  }
-  res.json(delMessageAut);
-});
-
 app.listen(port, () => {
   console.log(`the server at http://localhost:${port}`);
 });

@@ -1,5 +1,5 @@
 {
-  "name": "MERAKI_Academy_Project_3",
+  "name": "project_3_v01",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -21,6 +21,7 @@
   "homepage": "https://github.com/HebaShiyyab/MERAKI_Academy_Project_3#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "mongoose": "^5.12.9",
     "uuidv4": "^6.2.8"
   }
 }
