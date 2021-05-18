@@ -88,6 +88,22 @@ app.put("/articles",(req,res)=>{
   }).catch((err)=>{
     res.json(err);
   })
+});
+app.delete("/articles/id",(req,res)=>{
+  Articles
+  .deleteOne({id:id}).then((result)=>{
+    res.json(result);
+  }).catch((err)=>{
+    res.json(err);
+  })
+});
+app.delete("/articles/author",(req,res)=>{
+  Articles
+  .deleteOne({author:author}).then((result)=>{
+    res.json(result);
+  }).catch((err)=>{
+    res.json(err);
+  })
 })
 app.listen(port, () => {
   console.log(`the server at http://localhost:${port}`);
