@@ -2,7 +2,7 @@ const express = require("express");
 const db = require("./project_3_v01");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { User, Articles, Comment } = require("./Schema");
+const { User, Articles, Comment, Role } = require("./Schema");
 const { uuid } = require("uuidv4");
 require("dotenv").config();
 const port = process.env.PORT;
@@ -53,7 +53,6 @@ app.post("/users", async (req, res) => {
 
       res.json(err);
     });
-  
 });
 app.post("/login", async (req, res) => {
   await User.findOne({ email: req.body.email })
@@ -70,8 +69,11 @@ app.post("/login", async (req, res) => {
             const payload = {
               userId: result._id,
               country: result.country,
-              // role:result.role
+              role: "admin",
+              permissions: ["MANAGE_USERS", "CREATE_COMMENTS"],
             };
+            // role:result.role
+
             const options = {
               expiresIn: "60h",
             };
@@ -89,45 +91,60 @@ app.post("/login", async (req, res) => {
       }
     })
     .catch((err) => {
-      console.log(err);
+      res.send(err);
     });
 });
-// const auth = (req, res, next) => {
-//   if (!req.headers.authorization) {
-//     // console.log(err)
-//     return res.json(err);
-//   } else {
-//     const token = req.headers.authorization.split(" ")[1];
-//     jwt.verify(token, secret, (err, result1) => {
-//       console.log(result1);
-//       if(err){
-//         res.json(err);
-//       }
-//       if (result1) {
-//         req.token = result1;
-//         next()
-//       };
-//     });
-//   }
-// };
+const authentication = (req, res, next) => {
+  if (!req.headers.authorization) {
+    return res.send({ message: "the token invalid expired ", status: "403" });
+  } else {
+    const token = req.headers.authorization.split(" ")[1];
+    jwt.verify(token, secret, (err, result) => {
+      // console.log(result);
+      if (err) {
+        res.send(err);
+      }
+      if (result) {
+        req.token = result;
+        // console.log(req.token);
 
-// app.get("/login", auth, (req, res) => {
-//   console.log("heba");
-// });
-app.post("/articles/:id/comments", (req, res) => {
-  const id = req.params.id;
-  const { comment, commenter } = req.body;
-  const commentNew = new Comment({ comment, commenter });
-  commentNew
-    .save()
-    .then((result) => {
-      res.status(201);
-      res.json(result);
-    })
-    .catch((err) => {
-      res.json(err);
+        next();
+      }
     });
-});
+  }
+};
+const authorization = (string) => {
+  return (fun = (req, res, next) => {
+    const permissions  = req.token.role.permissions;
+    console.log(permissions);
+    for (let i = 0; i < permissions.length; i++) {
+      if (permissions[i] === string) {
+         next();
+      }
+    }
+    return res.json({message: 'forbidden ', status: 403})
+  });
+};
+
+app.post(
+  "/articles/:id/comments",
+  authentication,
+  authorization("CREATE_COMMENT"),
+  async (req, res) => {
+    const id = req.params.id;
+    const { comment, commenter } = req.body;
+    const commentNew = new Comment({ comment, commenter });
+    await commentNew
+      .save()
+      .then((result) => {
+        res.status(201);
+        res.json(result);
+      })
+      .catch((err) => {
+        res.send(err);
+      });
+  }
+);
 app.get("/articles", (req, res) => {
   Articles.find({})
     .then((result) => {
