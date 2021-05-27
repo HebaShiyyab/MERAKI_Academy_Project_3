@@ -1,0 +1,41 @@
+.App {
+  border: 3px solid green;
+  font-size: 10px;
+}
+
+.register {
+  margin: 8px;
+  border: 3px solid rgb(54, 23, 194);
+}
+
+.Navigation {
+  /* display: flex;
+  gap: 40px; */
+  margin: 2px;
+  border: 3px solid red;
+  padding: 15px;
+}
+.Login {
+  border: 3px solid purple;
+  margin-top: 4px;
+  padding: 5px;
+}
+
+button {
+  background-color: royalblue;
+  color: whitesmoke;
+  height: 30px;
+  margin: 5px;
+}
+
+input {
+  display: flex;
+  padding: 4px;
+  margin: 6px;
+}
+ 
+.message{
+  padding: 4px;
+  margin-top: 4px;
+
+}
