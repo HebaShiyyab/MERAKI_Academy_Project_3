@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default function Register() {
   const [message, setMessage] = useState('')
+
   // const [newUser, setNewUser] = useState([]);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -21,12 +22,12 @@ export default function Register() {
         password: password,
       })
       .then((response) => {
-        console.log(response.data);
-        if (response.data) {
-          setMessage("Error happened while register, please try again");
-        } else {
-          //    response.json("Error happened while register, please try again");
+
+        if (response.status === 201 ) {
+          console.log(response.data)
           setMessage("The user has been created successfully");
+        } else {
+          setMessage("Error happened while register, please try again");
         }
       })
       .catch((error) => {
